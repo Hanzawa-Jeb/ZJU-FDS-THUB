@@ -38,6 +38,7 @@ void testTop(AdjPtr * graph, int thres, int testN, int c_num)
         scanf("%d %d", &src, &dest);
         findHub(graph, thres, c_num, src, dest);
     }
+    scanf(NULL);
 }
 
 void findHub(AdjPtr * graph, int thres, int c_num, int src, int dest)
@@ -61,10 +62,11 @@ void findHub(AdjPtr * graph, int thres, int c_num, int src, int dest)
     DistList[src] = 0;
     Dijkstra(graph, KnownList, PathList, DistList, PathTop, src, dest, c_num);
     //find the shortest path from src to dest
-    //下一步就是从dest开始入队，队列中始终取第一个元素然后把全部前连的节点都加进来，然后直到队列为空，就可以完成统计。
+    reverseCheckHub(src, dest, c_num, PathTop, PathList, thres);
+    //check the transportation hubs
 }
 
-void Dijkstra(AdjPtr * graph, bool * KnownList, int ** PathList, 
+void Dijkstra(AdjPtr * graph, bool * KnownList, int ** PathList,
     int * DistList, int * PathTop, int src, int dest, int c_num)
 {
     int currMin;
@@ -130,4 +132,46 @@ int findMinUn(bool * KnownList, int * DistList, int c_num)
         }
     }
     return minCity;
+}
+
+void reverseCheckHub(int src, int dest, int c_num, int * PathTop, int ** PathList, int thres)
+{
+    int * cityCntTab = (int *)calloc(c_num, sizeof(int));
+    //the table to store the count of all cities, will be used to check hubs.
+    int * tempQue = (int *)calloc(10000000, sizeof(int));
+    //used to store the path of all cities
+    bool flag = false;
+    //the flag for whether hub exists
+    int currCity;
+    //the current city in our traversal
+    int queHead = 0;
+    int queTail = 1;
+    //the head and tail of the queue
+    tempQue[0] = dest;
+    //initialize the que
+    while (queHead != queTail) {
+        currCity = tempQue[queHead];
+        queHead ++;
+        cityCntTab[currCity] ++;
+        for (int i = 0; i < PathTop[currCity]; i ++) {
+            //traverse through all the predecessor of the 
+            tempQue[queTail] = PathList[currCity][i];
+            //add the predecessor city into the list
+            queTail ++;
+        }
+    }
+    cityCntTab[dest] = 0;
+    cityCntTab[src] = 0;
+    //make sure the destination and source are not considered
+    //next, with the information in the cityCntTab, we can find the hubs.
+    for (int i = 0; i < c_num; i ++) {
+        if (cityCntTab[i] >= thres) {
+            printf("%d ", i);
+            flag = true;
+        }
+    }
+    if (!flag) {
+        printf("None");
+    }
+    printf("\n");
 }

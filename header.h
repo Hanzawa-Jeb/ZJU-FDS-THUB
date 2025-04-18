@@ -24,5 +24,7 @@ void Dijkstra(AdjPtr * graph, bool * KnownList, int ** PathList,
 //used in findHub(), to calculate the 
 int findMinUn(bool * KnownList, int * DistList, int c_num);
 //used to find the unknown city with the minimum distance
+void reverseCheckHub(int src, int dest, int c_num, int * PathTop, int ** PathList, int thres);
+//used to check the transportation hubs in the shortest path
 
 #endif
