@@ -38,7 +38,7 @@ void testTop(AdjPtr * graph, int thres, int testN, int c_num)
         scanf("%d %d", &src, &dest);
         findHub(graph, thres, c_num, src, dest);
     }
-    scanf(NULL);
+    getchar();
 }
 
 void findHub(AdjPtr * graph, int thres, int c_num, int src, int dest)
@@ -134,44 +134,41 @@ int findMinUn(bool * KnownList, int * DistList, int c_num)
     return minCity;
 }
 
+void dfsCountPath(int curr, int src, int * PathTop, int ** PathList, int * cityCntTab, int * path, int pathLen) {
+    path[pathLen++] = curr;
+
+    if (curr == src) {
+        for (int i = 1; i < pathLen - 1; i++) {
+            cityCntTab[path[i]]++;
+        }
+        return;
+    }
+
+    for (int i = 0; i < PathTop[curr]; i++) {
+        dfsCountPath(PathList[curr][i], src, PathTop, PathList, cityCntTab, path, pathLen);
+    }
+}
+
 void reverseCheckHub(int src, int dest, int c_num, int * PathTop, int ** PathList, int thres)
 {
     int * cityCntTab = (int *)calloc(c_num, sizeof(int));
-    //the table to store the count of all cities, will be used to check hubs.
-    int * tempQue = (int *)calloc(10000000, sizeof(int));
-    //used to store the path of all cities
+    int * path = (int *)calloc(c_num, sizeof(int));
     bool flag = false;
-    //the flag for whether hub exists
-    int currCity;
-    //the current city in our traversal
-    int queHead = 0;
-    int queTail = 1;
-    //the head and tail of the queue
-    tempQue[0] = dest;
-    //initialize the que
-    while (queHead != queTail) {
-        currCity = tempQue[queHead];
-        queHead ++;
-        cityCntTab[currCity] ++;
-        for (int i = 0; i < PathTop[currCity]; i ++) {
-            //traverse through all the predecessor of the 
-            tempQue[queTail] = PathList[currCity][i];
-            //add the predecessor city into the list
-            queTail ++;
-        }
-    }
-    cityCntTab[dest] = 0;
-    cityCntTab[src] = 0;
-    //make sure the destination and source are not considered
-    //next, with the information in the cityCntTab, we can find the hubs.
-    for (int i = 0; i < c_num; i ++) {
+
+    dfsCountPath(dest, src, PathTop, PathList, cityCntTab, path, 0);
+
+    for (int i = 0; i < c_num; i++) {
         if (cityCntTab[i] >= thres) {
             printf("%d ", i);
             flag = true;
         }
     }
+
     if (!flag) {
         printf("None");
     }
     printf("\n");
+
+    free(cityCntTab);
+    free(path);
 }

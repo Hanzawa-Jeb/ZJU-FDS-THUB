@@ -26,5 +26,7 @@ int findMinUn(bool * KnownList, int * DistList, int c_num);
 //used to find the unknown city with the minimum distance
 void reverseCheckHub(int src, int dest, int c_num, int * PathTop, int ** PathList, int thres);
 //used to check the transportation hubs in the shortest path
+void dfsCountPath(int curr, int src, int * PathTop, int ** PathList, int * cityCntTab, int * path, int pathLen);
+
 
 #endif
